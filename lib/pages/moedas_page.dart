@@ -36,7 +36,11 @@ class _MoedasPageState extends State<MoedasPage> {
                   borderRadius: BorderRadius.all(
                 Radius.circular(12),
               )),
-              leading: SizedBox(
+              leading: (selecionadas.contains(tabela[moeda]))
+              ? CircleAvatar(  
+                child: Icon(Icons.check),
+              )
+              : SizedBox(
                 child: Image.asset(tabela[moeda].icone),
                 width: 40,
               ),
