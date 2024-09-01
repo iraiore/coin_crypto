@@ -1,4 +1,5 @@
 import 'package:crypto_coin/moedas/moeda.dart';
+import 'package:crypto_coin/pages/moedas_detalhes_page.dart';
 import 'package:crypto_coin/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; //pacote para formartar os valor monetário
@@ -36,7 +37,7 @@ class _MoedasPageState extends State<MoedasPage> {
         title: Text('${selecionadas.length} selecionadas'),
         backgroundColor: Colors.blueGrey[50],
         elevation: 1,
-        iconTheme: IconThemeData(color:Colors.black87),
+        iconTheme: IconThemeData(color: Colors.black87),
         /*textTheme: TextTheme(
           headline:TextStyle(
             color: Colors.black87,
@@ -48,67 +49,76 @@ class _MoedasPageState extends State<MoedasPage> {
     }
   }
 
+  mostrarDetalhes(Moeda moeda) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MoedasDetalhesPage(moeda: moeda),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarDinamica(),
-      //mostrando os itens da classe moeda repository na tela da classa moedas page
-      body: ListView.separated(
-        itemBuilder: (BuildContext context, int moeda) {
-          return ListTile(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-              Radius.circular(12),
-            )),
-            leading: (selecionadas.contains(tabela[moeda]))
-                ? CircleAvatar(
-                    child: Icon(Icons.check),
-                  )
-                : SizedBox(
-                    child: Image.asset(tabela[moeda].icone),
-                    width: 40,
-                  ),
-            title: Text(
-              tabela[moeda].nome,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
+        appBar: AppBarDinamica(),
+        //mostrando os itens da classe moeda repository na tela da classa moedas page
+        body: ListView.separated(
+          itemBuilder: (BuildContext context, int moeda) {
+            return ListTile(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                Radius.circular(12),
+              )),
+              leading: (selecionadas.contains(tabela[moeda]))
+                  ? CircleAvatar(
+                      child: Icon(Icons.check),
+                    )
+                  : SizedBox(
+                      child: Image.asset(tabela[moeda].icone),
+                      width: 40,
+                    ),
+              title: Text(
+                tabela[moeda].nome,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            trailing: Text(
-              real.format(tabela[moeda].preco),
-            ),
-            selected: selecionadas.contains(tabela[moeda]),
-            selectedTileColor: Colors.indigo[50],
-            onLongPress: () {
-              //verificando se já existem itens selecionados e removendo quando pressionados
-              setState(() {
-                (selecionadas.contains(tabela[moeda]))
-                    ? selecionadas.remove(tabela[moeda])
-                    : selecionadas.add(tabela[moeda]);
-              });
-            },
-          );
-        },
-        padding: EdgeInsets.all(16),
-        separatorBuilder: (_, __) => Divider(),
-        itemCount: tabela
-            .length, //o flutter precisa saber qual o tamanho da lista pra poder rendereizar
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: selecionadas.isNotEmpty
-        ? FloatingActionButton.extended(
-            onPressed: (){},
-            icon: Icon(Icons.star),
-            label: Text(
-                'FAVORITAR',
-               style: TextStyle(
-                letterSpacing: 0,
-                fontWeight: FontWeight.bold,
-             ),
-           ),
-          )
-        : null  
-    );
+              trailing: Text(
+                real.format(tabela[moeda].preco),
+              ),
+              selected: selecionadas.contains(tabela[moeda]),
+              selectedTileColor: Colors.indigo[50],
+              onLongPress: () {
+                //verificando se já existem itens selecionados e removendo quando pressionados
+                setState(() {
+                  (selecionadas.contains(tabela[moeda]))
+                      ? selecionadas.remove(tabela[moeda])
+                      : selecionadas.add(tabela[moeda]);
+                });
+              },
+              onTap: () => mostrarDetalhes(tabela[moeda]),
+            );
+          },
+          padding: EdgeInsets.all(16),
+          separatorBuilder: (_, __) => Divider(),
+          itemCount: tabela
+              .length, //o flutter precisa saber qual o tamanho da lista pra poder rendereizar
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: selecionadas.isNotEmpty
+            ? FloatingActionButton.extended(
+                onPressed: () {},
+                icon: Icon(Icons.star),
+                label: Text(
+                  'FAVORITAR',
+                  style: TextStyle(
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : null);
   }
 }
