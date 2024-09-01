@@ -1,8 +1,10 @@
 import 'package:crypto_coin/moedas/moeda.dart';
 import 'package:crypto_coin/pages/moedas_detalhes_page.dart';
+import 'package:crypto_coin/repositories/favoritas_repository.dart';
 import 'package:crypto_coin/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; //pacote para formartar os valor monetário
+import 'package:provider/provider.dart';
 
 class MoedasPage extends StatefulWidget {
   MoedasPage({super.key});
@@ -12,12 +14,13 @@ class MoedasPage extends StatefulWidget {
 }
 
 class _MoedasPageState extends State<MoedasPage> {
-  final tabela = MoedaRepository.tabela;
   //acessando a tabela e atribuindo a var tabela (final = não vai mudar)
-  NumberFormat real = NumberFormat.currency(locale: 'pt_BR', name: 'R\$');
+  final tabela = MoedaRepository.tabela;
   //formatando o valor monetário das cryptomoedas
-  List<Moeda> selecionadas =
-      []; // lista criada para implementar a funcao de selecionar as opcoes
+  NumberFormat real = NumberFormat.currency(locale: 'pt_BR', name: 'R\$');
+  // lista criada para implementar a funcao de selecionar as opcoes
+  List<Moeda> selecionadas = [];
+  late FavoritasRepository favoritas;
 
   AppBarDinamica() {
     if (selecionadas.isEmpty) {
@@ -49,6 +52,7 @@ class _MoedasPageState extends State<MoedasPage> {
     }
   }
 
+  //com o material pageroute a pagina e o botao de volta já é criado
   mostrarDetalhes(Moeda moeda) {
     Navigator.push(
       context,
@@ -58,8 +62,17 @@ class _MoedasPageState extends State<MoedasPage> {
     );
   }
 
+  limparSelecionadas() {
+    setState(() {
+      selecionadas = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    favoritas = Provider.of<FavoritasRepository>(context);
+    //favoritas = context.watch<FavoritasRepository>();
+
     return Scaffold(
         appBar: AppBarDinamica(),
         //mostrando os itens da classe moeda repository na tela da classa moedas page
@@ -68,8 +81,8 @@ class _MoedasPageState extends State<MoedasPage> {
             return ListTile(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
-                Radius.circular(12),
-              )),
+                    Radius.circular(12),
+                  ),),
               leading: (selecionadas.contains(tabela[moeda]))
                   ? CircleAvatar(
                       child: Icon(Icons.check),
@@ -78,15 +91,22 @@ class _MoedasPageState extends State<MoedasPage> {
                       child: Image.asset(tabela[moeda].icone),
                       width: 40,
                     ),
-              title: Text(
-                tabela[moeda].nome,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              title: Row(
+                    children: [
+                      Text(
+                        tabela[moeda].nome,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if(favoritas.lista.contains(tabela[moeda]))
+                        Icon(Icons.star, color: Colors.blue, size: 8,)
+                    ],
+                  ), 
               trailing: Text(
                 real.format(tabela[moeda].preco),
+                style: TextStyle(fontSize:15),
               ),
               selected: selecionadas.contains(tabela[moeda]),
               selectedTileColor: Colors.indigo[50],
@@ -96,29 +116,32 @@ class _MoedasPageState extends State<MoedasPage> {
                   (selecionadas.contains(tabela[moeda]))
                       ? selecionadas.remove(tabela[moeda])
                       : selecionadas.add(tabela[moeda]);
-                });
-              },
+                  });
+                },
               onTap: () => mostrarDetalhes(tabela[moeda]),
             );
           },
           padding: EdgeInsets.all(16),
           separatorBuilder: (_, __) => Divider(),
-          itemCount: tabela
-              .length, //o flutter precisa saber qual o tamanho da lista pra poder rendereizar
+           //o flutter precisa saber qual o tamanho da lista pra poder rendereizar
+          itemCount: tabela.length,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: selecionadas.isNotEmpty
             ? FloatingActionButton.extended(
-                onPressed: () {},
+                onPressed: () {
+                  favoritas.saveAll(selecionadas);
+                  limparSelecionadas();
+                },
                 icon: Icon(Icons.star),
                 label: Text(
-                  'FAVORITAR',
-                  style: TextStyle(
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
+                        'FAVORITAR',
+                        style: TextStyle(
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                )
             : null);
   }
 }
