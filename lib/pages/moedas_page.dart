@@ -21,12 +21,10 @@ class _MoedasPageState extends State<MoedasPage> {
   AppBarDinamica() {
     if (selecionadas.isEmpty) {
       return AppBar(
-        backgroundColor: Colors.blue,
         title: Text('Cripto Moedas'),
       );
     } else {
       return AppBar(
-        backgroundColor: Colors.blue,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -35,7 +33,17 @@ class _MoedasPageState extends State<MoedasPage> {
             });
           },
         ),
-        title: Text('${selecionadas.length} selecionadas')
+        title: Text('${selecionadas.length} selecionadas'),
+        backgroundColor: Colors.blueGrey[50],
+        elevation: 1,
+        iconTheme: IconThemeData(color:Colors.black87),
+        /*textTheme: TextTheme(
+          headline:TextStyle(
+            color: Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),*/
       );
     }
   }
@@ -87,6 +95,20 @@ class _MoedasPageState extends State<MoedasPage> {
         itemCount: tabela
             .length, //o flutter precisa saber qual o tamanho da lista pra poder rendereizar
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: selecionadas.isNotEmpty
+        ? FloatingActionButton.extended(
+            onPressed: (){},
+            icon: Icon(Icons.star),
+            label: Text(
+                'FAVORITAR',
+               style: TextStyle(
+                letterSpacing: 0,
+                fontWeight: FontWeight.bold,
+             ),
+           ),
+          )
+        : null  
     );
   }
 }
